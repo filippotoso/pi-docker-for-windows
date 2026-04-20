@@ -1,6 +1,6 @@
 # Pi Docker Environment
 
-This repository contains the scripts and the `Dockerfile` necessary to securely run [pi](https://github.com/mariozechner/pi-coding-agent) inside an isolated Docker container.
+This repository contains the scripts and the `Dockerfile` necessary to securely run [pi](https://pi.dev/) inside an isolated Docker container.
 
 The environment is configured to map two key directories from your host system into the container:
 1. **The source directory**: The project on which `pi` needs to work.
