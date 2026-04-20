@@ -1,37 +1,39 @@
 # Pi Docker Environment
 
-Questo repository contiene gli script e il `Dockerfile` necessari per eseguire in sicurezza [pi](https://github.com/mariozechner/pi-coding-agent) all'interno di un container Docker isolato.
+This repository contains the scripts and the `Dockerfile` necessary to securely run [pi](https://github.com/mariozechner/pi-coding-agent) inside an isolated Docker container.
 
-L'ambiente è configurato per mappare due directory chiave dal tuo sistema host all'interno del container:
-1. **La directory dei sorgenti**: Il progetto su cui `pi` deve lavorare.
-2. **La directory `.pi`**: La configurazione, le skill e le estensioni di `pi`.
+The environment is configured to map two key directories from your host system into the container:
+1. **The source directory**: The project on which `pi` needs to work.
+2. **The `.pi` directory**: The configuration, skills, and extensions for `pi`.
 
-## Prerequisiti
+## Prerequisites
 
-- [Docker](https://www.docker.com/products/docker-desktop/) installato e funzionante sul sistema.
+- [Docker](https://www.docker.com/products/docker-desktop/) installed and running on your system.
 
-## 1. Costruire l'immagine Docker
+## 1. Build the Docker Image
 
-Prima di avviare l'ambiente, devi costruire l'immagine Docker (da eseguire solo la prima volta o quando vuoi aggiornare la versione di `pi`).
+Before starting the environment, you must build the Docker image (only needed the first time or when you want to update the `pi` version).
 
-**Su Windows:**
-Esegui lo script batch fornito:
+**On Windows:**
+Run the provided batch script:
+
 ```cmd
 build.bat
 ```
-Questo processo scaricherà un'immagine leggera di Node.js, installerà le dipendenze essenziali (`git`, `curl`, `jq`) e installerà l'ultima versione di `@mariozechner/pi-coding-agent` a livello globale.
 
-## 2. Eseguire Pi
+This process will download a lightweight Node.js image, install essential dependencies (`git`, `curl`, `jq`), and globally install the latest version of `@mariozechner/pi-coding-agent`.
 
-Puoi avviare l'ambiente usando lo script di avvio fornito.
+## 2. Run Pi
+
+You can start the environment using the provided run script.
 
 ```cmd
 run.bat
 ```
 
-## Dettagli tecnici
+## Technical Details
 
-- **Immagine base**: `node:22-bookworm-slim`
-- I sorgenti dell'host vengono montati su `/workspace` (che è la `WORKDIR` del container).
-- La cartella configurazione `.pi` dell'host viene montata su `/root/.pi` all'interno del container, garantendo che le tue preferenze, le chat passate e le estensioni siano persistenti tra un'esecuzione e l'altra.
-- Il container viene avviato con i flag `-it` per supportare l'interfaccia terminale interattiva (TUI) e `--rm` in modo da essere automaticamente distrutto all'uscita, mantenendo pulito il tuo sistema Docker.
+- **Base Image**: `node:22-bookworm-slim`
+- The host sources are mounted to `/workspace` (which is the container's `WORKDIR`).
+- The host's `.pi` configuration folder is mounted to `/root/.pi` inside the container, ensuring your preferences, past chats, and extensions are persistent across runs.
+- The container is started with the `-it` flags to support the interactive terminal interface (TUI) and `--rm` so it is automatically destroyed on exit, keeping your Docker system clean.
