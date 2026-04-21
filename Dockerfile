@@ -10,6 +10,9 @@ RUN apt-get update && apt-get install -y \
 
 RUN pip install --break-system-packages uv
 
+# Invalidiamo la cache aggiungendo un parametro che cambia sempre al build (passato con --build-arg CACHEBUST=$(date +%s))
+ARG CACHEBUST=1
+
 # Installiamo pi globalmente
 RUN npm install -g @mariozechner/pi-coding-agent
 
