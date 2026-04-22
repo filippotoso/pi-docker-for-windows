@@ -1,23 +1,43 @@
 FROM node:22-bookworm-slim
 
-# Installiamo dipendenze comuni che potrebbero servire a pi o allo sviluppo (git, curl, ecc.)
-RUN apt-get update && apt-get install -y \
+# Install common dependencies that might be needed for pi or development (git, curl, etc.)
+RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     curl \
     jq \
+    python3 \
     python3-pip \
+    python3-venv \
+    apt-transport-https \
+    lsb-release \
+    ca-certificates \
+    wget \
+    gnupg2 \
+    && wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg \
+    && echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list \
+    && apt-get update && apt-get install -y --no-install-recommends \
+    php8.4-cli \
+    php8.4-curl \
+    php8.4-mbstring \
+    php8.4-xml \
+    php8.4-zip \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip install --break-system-packages uv
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Invalidiamo la cache aggiungendo un parametro che cambia sempre al build (passato con --build-arg CACHEBUST=$(date +%s))
+RUN pip install --no-cache-dir --break-system-packages uv pytest
+
+# Invalidate the cache by adding a parameter that always changes on build (passed with --build-arg CACHEBUST=$(date +%s))
 ARG CACHEBUST=1
 
-# Installiamo pi globalmente
-RUN npm install -g @mariozechner/pi-coding-agent
+# Install pi globally
+RUN npm install -g @mariozechner/pi-coding-agent \
+    && npm cache clean --force
 
-# Impostiamo la directory di lavoro
+# Set the working directory
 WORKDIR /workspace
 
-# Il comando di default all'avvio del container
+# The default command when starting the container
 ENTRYPOINT ["pi"]
