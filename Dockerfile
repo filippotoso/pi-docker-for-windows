@@ -39,9 +39,16 @@ RUN pip install --no-cache-dir --break-system-packages uv pytest
 # Invalidate the cache by adding a parameter that always changes on build (passed with --build-arg CACHEBUST=$(date +%s))
 ARG CACHEBUST=1
 
+# Install Cursor CLI and make it reachable system-wide
+RUN curl https://cursor.com/install -fsS | bash
+ENV PATH="/root/.local/bin:${PATH}"
+
 # Install pi globally
 RUN npm install -g @mariozechner/pi-coding-agent \
     && npm cache clean --force
+
+# Cursor API Key (passed at runtime: docker run -e CURSOR_API_KEY=your_key)
+# ENV CURSOR_API_KEY=""
 
 # Set the working directory
 WORKDIR /workspace
