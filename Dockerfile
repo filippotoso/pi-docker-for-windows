@@ -44,7 +44,7 @@ RUN curl https://cursor.com/install -fsS | bash
 ENV PATH="/root/.local/bin:${PATH}"
 
 # Install pi globally
-RUN npm install -g @mariozechner/pi-coding-agent \
+RUN npm install -g @earendil-works/pi-coding-agent \
     && npm cache clean --force
 
 # Cursor API Key (passed at runtime: docker run -e CURSOR_API_KEY=your_key)
