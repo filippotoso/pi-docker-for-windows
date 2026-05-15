@@ -2,6 +2,7 @@ FROM node:22-bookworm-slim
 
 # Install common dependencies that might be needed for pi or development (git, curl, etc.)
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    gosu \
     git \
     curl \
     jq \
@@ -39,19 +40,25 @@ RUN pip install --no-cache-dir --break-system-packages uv pytest
 # Invalidate the cache by adding a parameter that always changes on build (passed with --build-arg CACHEBUST=$(date +%s))
 ARG CACHEBUST=1
 
-# Install Cursor CLI and make it reachable system-wide
-RUN curl https://cursor.com/install -fsS | bash
-ENV PATH="/root/.local/bin:${PATH}"
+# Install Cursor CLI and copy binaries to a path usable by the unprivileged user
+RUN curl https://cursor.com/install -fsS | bash \
+    && install -d /usr/local/bin \
+    && if [ -d /root/.local/bin ]; then cp -a /root/.local/bin/. /usr/local/bin/; fi
+ENV PATH="/usr/local/bin:${PATH}"
 
 # Install pi globally
 RUN npm install -g @earendil-works/pi-coding-agent \
     && npm cache clean --force
 
-# Cursor API Key (passed at runtime: docker run -e CURSOR_API_KEY=your_key)
-# ENV CURSOR_API_KEY=""
+# API keys: mount a host secret file to /run/secrets/cursor_api_key (see README).
+
+RUN groupadd --gid 1000 sandbox \
+    && useradd --uid 1000 --gid sandbox --home-dir /home/sandbox --shell /usr/sbin/nologin sandbox \
+    && install -d -o sandbox -g sandbox /home/sandbox
+
+COPY --chmod=755 entrypoint.sh /usr/local/bin/pi-entrypoint.sh
 
 # Set the working directory
 WORKDIR /workspace
 
-# The default command when starting the container
-ENTRYPOINT ["pi"]
+ENTRYPOINT ["/usr/local/bin/pi-entrypoint.sh"]
