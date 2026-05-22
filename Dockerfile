@@ -45,6 +45,7 @@ ENV PATH="/root/.local/bin:${PATH}"
 
 # Install pi globally
 RUN npm install -g @earendil-works/pi-coding-agent \
+    && npm install -g "mysql2@^3.14.0" \
     && npm cache clean --force
 
 # Cursor API Key (passed at runtime: docker run -e CURSOR_API_KEY=your_key)
