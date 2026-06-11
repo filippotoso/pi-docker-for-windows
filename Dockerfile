@@ -34,7 +34,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-RUN pip install --no-cache-dir --break-system-packages uv pytest
+RUN pip install --no-cache-dir --break-system-packages uv pytest graphifyy \
+    && graphify install --platform pi
 
 # Invalidate the cache by adding a parameter that always changes on build (passed with --build-arg CACHEBUST=$(date +%s))
 ARG CACHEBUST=1

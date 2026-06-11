@@ -3,3 +3,4 @@
 /src/*
 !/src/.gitkeep
 agent.bat
+/discarded
