@@ -21,9 +21,12 @@ type
     procedure HTTPServerCommandGet(AContext: TIdContext;
       ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
     procedure Exity1Click(Sender: TObject);
+    procedure NotificationCenterReceiveLocalNotification(Sender: TObject;
+      ANotification: TNotification);
   private
     procedure ConfigureServerFromCommandLine;
     procedure ShowBeepNotification;
+    procedure FocusWorkspaceWindow;
   public
     { Public declarations }
   end;
@@ -83,6 +86,68 @@ end;
 
 const
   BEEP_NOTIFICATION_ID = 1;
+
+type
+  PFocusWindowSearch = ^TFocusWindowSearch;
+  TFocusWindowSearch = record
+    Substring: string;
+    TargetHwnd: HWND;
+  end;
+
+function EnumWorkspaceWindowCallback(Wnd: HWND; LParam: LPARAM): BOOL; stdcall;
+var
+  Buf: array[0..511] of Char;
+  Len: Integer;
+  Title: string;
+  Search: PFocusWindowSearch;
+begin
+  Search := PFocusWindowSearch(LParam);
+  if Search^.TargetHwnd <> 0 then
+  begin
+    Result := False;
+    Exit;
+  end;
+
+  if not IsWindowVisible(Wnd) then
+  begin
+    Result := True;
+    Exit;
+  end;
+
+  Len := GetWindowText(Wnd, Buf, Length(Buf));
+  if Len > 0 then
+  begin
+    Title := string(Buf);
+    if Pos(Search^.Substring, Title) > 0 then
+    begin
+      Search^.TargetHwnd := Wnd;
+      Result := False;
+      Exit;
+    end;
+  end;
+  Result := True;
+end;
+
+procedure TForm1.FocusWorkspaceWindow;
+var
+  Search: TFocusWindowSearch;
+begin
+  Search.Substring := '- workspace';
+  Search.TargetHwnd := 0;
+  EnumWindows(@EnumWorkspaceWindowCallback, LPARAM(@Search));
+  if Search.TargetHwnd <> 0 then
+  begin
+    if IsIconic(Search.TargetHwnd) then
+      ShowWindow(Search.TargetHwnd, SW_RESTORE);
+    SetForegroundWindow(Search.TargetHwnd);
+  end;
+end;
+
+procedure TForm1.NotificationCenterReceiveLocalNotification(Sender: TObject;
+  ANotification: TNotification);
+begin
+  FocusWorkspaceWindow;
+end;
 
 procedure TForm1.ShowBeepNotification;
 var

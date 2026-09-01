@@ -4,3 +4,7 @@
 !/src/.gitkeep
 agent.bat
 /discarded
+/agent.reg
+/.cursor
+/.planning
+/pi-agent-launcher

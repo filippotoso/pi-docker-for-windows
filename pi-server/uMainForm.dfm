@@ -4271,5 +4271,6 @@ object Form1: TForm1
   object NotificationCenter: TNotificationCenter
     Left = 152
     Top = 16
+    OnReceiveLocalNotification = NotificationCenterReceiveLocalNotification
   end
 end
